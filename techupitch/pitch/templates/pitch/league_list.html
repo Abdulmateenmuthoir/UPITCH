@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>League List</h1>
+  {% if league_list %}
+    <ul>
+      {% for league in league_list %}
+      <li>
+        <a href="{{ league.get_absolute_url }}">{{ league.name }}</a>
+        ({{league.sport}})
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no League yet.</p>
+  {% endif %}
+{% endblock %}

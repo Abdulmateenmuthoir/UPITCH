@@ -1,0 +1,17 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Match List</h1>
+  {% if match_list %}
+    <ul>
+      {% for match in match_list %}
+      <li>
+        <a href="{{ match.get_absolute_url }}">{{ match.home_team }}</a>
+        ({{match.away_team}}) <br>  ({{match.home_score}}) : ({{match.away_score}})
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no Match in the library.</p>
+  {% endif %}
+{% endblock %}

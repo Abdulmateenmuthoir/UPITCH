@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Sport List</h1>
+  {% if sport_list %}
+    <ul>
+      {% for sport in sport_list %}
+      <li>
+        <h3>{{sport.name}}</h3>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no Sport yet</p>
+  {% endif %}
+{% endblock %}

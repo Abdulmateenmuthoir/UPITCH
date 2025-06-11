@@ -8,7 +8,7 @@ admin.site.register(League)
 #admin.site.register(Team)
 #admin.site.register(Match)
 #admin.site.register(Player)
-admin.site.register(Event)
+#admin.site.register(Event)
 
 
 class PlayerAdmin(admin.ModelAdmin):
@@ -28,6 +28,11 @@ admin.site.register(Match, MatchAdmin)
 
 class TeamAdmin(admin.ModelAdmin):
 
-    list_display = ('logo', 'name')
+    list_display = ('name', 'logo')
 
 admin.site.register(Team, TeamAdmin)
+
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('match', 'event_type', 'player_name')
+    
+admin.site.register(Event, EventAdmin)

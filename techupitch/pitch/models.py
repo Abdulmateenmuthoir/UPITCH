@@ -43,6 +43,8 @@ class League(models.Model):
         return self.name
 
     def get_absolute_url(self):
+
+        
         """Returns the url to access a particular sport."""
         return reverse('league-detail', args=[str(self.id)])
 
@@ -50,6 +52,7 @@ class Team(models.Model):
     name = models.CharField(max_length=200)
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE)
     logo = models.ImageField(upload_to='team_logos/', blank=True, null=True)
+    league = models.ForeignKey(League, on_delete=models.CASCADE, default=1)  # or other on_delete options
 
     def __str__(self):
         return self.name
@@ -91,7 +94,7 @@ class Player(models.Model):
     position = models.CharField(max_length=100, null=True, blank=True)
     image = models.ImageField(upload_to='player_images/', blank=True, null=True)
     class Meta:
-        ordering = ['name', 'team']
+        ordering = ['name', 'team'] 
 
     def get_absolute_url(self):
         """Returns the URL to access a particular player instance."""
@@ -114,7 +117,7 @@ class Event(models.Model):
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.event_type}'
 
     def get_absolute_url(self):
         """Returns the url to access a particular team."""

@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1> Player Name:{{ player.name }} </h1>
+
+  <p><strong>Department</strong> {{ player.dept }}</p>
+  <!-- author detail link not yet defined -->
+  <p><strong>Team:</strong> {{ player.team }}</p>
+  <p><strong>position:</strong> {{ player.position }}</p>
+  <p><strong>Date Of Birth :</strong> {{ player.date_of_birth }}</p>
+ 
+
+{% endblock %}
