@@ -19,4 +19,12 @@ urlpatterns = [
     path('players/', views.PlayerListView.as_view(), name= 'players'),
     path('players/<int:pk>', views.PlayerDetailView.as_view(), name= 'player-detail'),
     path('sports/', views.SportListView.as_view(), name= 'sports' ),
+
+    # Add Django site authentication urls (for login, logout, password management)
+
+    urlpatterns += [
+        path('accounts/', include('django.contrib.auth.urls')),
+    ]
+
+
 ]

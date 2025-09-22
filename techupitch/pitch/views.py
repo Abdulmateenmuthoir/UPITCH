@@ -38,7 +38,7 @@ from django.db.models import Q, F, Sum
 from .models import League, Match  
 
 def calculate_league_table(league):
-    teams = league.team_set.all()
+    teams = league.teams.all()
     table = []
 
     for team in teams:

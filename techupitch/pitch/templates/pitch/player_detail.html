@@ -5,9 +5,12 @@
 
   <p><strong>Department</strong> {{ player.dept }}</p>
   <!-- author detail link not yet defined -->
-  <p><strong>Team:</strong> {{ player.team }}</p>
-  <p><strong>position:</strong> {{ player.position }}</p>
-  <p><strong>Date Of Birth :</strong> {{ player.date_of_birth }}</p>
+  <p><strong>Current Team: </strong> {{ player.team }}</p>
+  <p><strong>position: </strong> {{ player.position }}</p>
+  <p><strong>University: </strong> {{player.university}}</p>
+  <p><strong>Number: </strong> {{player.jersey_number}}</p>
+  <p><strong>Date Of Birth : </strong> {{ player.date_of_birth }}</p>
+  <p><strong>Height: </strong>  <td>{{ player.height_cm}}</td> </p>
  
 
 {% endblock %}

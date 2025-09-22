@@ -6,7 +6,19 @@
   <p><strong>Logo:</strong> {{ team.logo }} </p>
   <!-- author detail link not yet defined -->
   <p><strong>Sport:</strong> {{ team.sport }}</p>
-  <p><strong>ISBN:</strong> {{ team.league }}</p>
+  <p><strong>University:</strong> {{ team.university }}</p>
+
+ 
+
+
+  <p><strong>Leagues:</strong>
+  {% for lg in team.leagues.all %}
+    <a href="{{ lg.get_absolute_url }}">{{ lg.name }}</a>{% if not forloop.last %}, {% endif %}
+  {% empty %}
+    <em>No leagues assigned</em>
+  {% endfor %}
+  </p>
+
 
 
 

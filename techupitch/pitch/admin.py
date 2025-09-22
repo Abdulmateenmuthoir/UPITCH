@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Sport, League, Team, Match, Player, Event
+from .models import Sport, League, Team, Match, Player, Event, University
 
 admin.site.register(Sport)
 admin.site.register(League)
@@ -13,8 +13,6 @@ admin.site.register(League)
 
 class PlayerAdmin(admin.ModelAdmin):
     list_display = ('name', 'dept', 'team', 'date_of_birth')
-
-    fields = ['name', 'dept', ('team', 'date_of_birth')]
 
 admin.site.register(Player, PlayerAdmin)
 
@@ -36,3 +34,8 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('match', 'event_type', 'player_name')
     
 admin.site.register(Event, EventAdmin)
+
+class UniversityAdmin(admin.ModelAdmin):
+    list_display = ('short_name', 'twitter')
+
+admin.site.register(University, UniversityAdmin)

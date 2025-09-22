@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 
 # Create your models here.
 from django.urls import reverse # Used in get_absolute_url() to get URL for specified ID
@@ -6,6 +7,9 @@ from django.urls import reverse # Used in get_absolute_url() to get URL for spec
 from django.db.models import UniqueConstraint # Constrains fields to unique values
 from django.db.models.functions import Lower # Returns lower cased value of field
 from django.shortcuts import render
+
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 class Sport(models.Model):
     """Model representing a book genre."""
@@ -32,10 +36,43 @@ class Sport(models.Model):
             ),
         ]
 
+
+
+
+
+class University(models.Model):
+    name = models.CharField(max_length=160, unique=True)
+    short_name = models.CharField(max_length=32, blank=True)
+    city = models.CharField(max_length=64, blank=True)
+    state = models.CharField(max_length=64, blank=True)
+    logo = models.ImageField(upload_to="universities/logos/", blank=True)
+
+    # Optional: add social handles or website
+    website = models.URLField(blank=True)
+    instagram = models.CharField(max_length=60, blank=True)
+    twitter = models.CharField(max_length=60, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.short_name or self.name
+
+
+
+
 class League(models.Model):
+    
     name = models.CharField(max_length=200)
     sport = models.ForeignKey('Sport', on_delete=models.CASCADE)
-    university = models.CharField(max_length=100, blank=True, null=True) # Optional, country of the league.
+    
+    university = models.ForeignKey(
+        University, null=True, blank=True, on_delete=models.SET_NULL, related_name="league"
+    )
+    
     logo = models.ImageField(upload_to='league_logos/', blank=True, null=True) # Optional, league logo.
     abbreviation = models.CharField(max_length=10, blank=True, null=True) # Optional, short name or abbreviation.
 
@@ -52,7 +89,13 @@ class Team(models.Model):
     name = models.CharField(max_length=200)
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE)
     logo = models.ImageField(upload_to='team_logos/', blank=True, null=True)
-    league = models.ForeignKey(League, on_delete=models.CASCADE, default=1)  # or other on_delete options
+
+    league = models.ManyToManyField(League, related_name="teams", blank=True)
+
+    
+    university = models.ForeignKey(University, on_delete=models.CASCADE, blank=True, null=True)
+    def league_names(self):
+        return ",".join(self.league.values_list("name", flat=True))
 
     def __str__(self):
         return self.name
@@ -88,11 +131,27 @@ from django.db import models
 class Player(models.Model):
     """Model representing an player."""
     dept = models.CharField(max_length=100)
+
     name = models.CharField(max_length=200)
+
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
     date_of_birth = models.DateField(null=True, blank=True)
-    position = models.CharField(max_length=100, null=True, blank=True)
+
+    position = models.CharField(max_length=50, choices=[ ("GK", "Goalkeeper"), ("DF", "Defender"), ("MF", "Midfielder"), ("FW", "Forward"),], null=True )
+
+    height_cm = models.PositiveIntegerField(blank=True, null=True)
+
     image = models.ImageField(upload_to='player_images/', blank=True, null=True)
+
+    university = models.ForeignKey(
+        University, null=True, blank=True, on_delete=models.SET_NULL, related_name="players"
+    )
+
+    jersey_number = models.PositiveSmallIntegerField(
+        null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(99)]
+    )
+    
     class Meta:
         ordering = ['name', 'team'] 
 
