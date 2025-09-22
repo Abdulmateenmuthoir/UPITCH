@@ -58,6 +58,10 @@ Tech-U Pitch: A web application for real-time sports competition updates at Firs
    cpp
    http://127.0.0.1:800
 
+
+---
+
+
 -- League Table Example
 
 The application automatically calculates:
@@ -75,11 +79,18 @@ Points
 Position in the table
 
 
+---
+
+
 -- Authentication
 
 Users can log in/out using Django’s built-in authentication system.
 
 Admin panel available at /admin/ for managing models (sports, leagues, matches, players, etc.).
+
+
+
+---
 
  
  -- Contributing
