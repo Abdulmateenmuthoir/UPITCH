@@ -10,6 +10,15 @@ from django.shortcuts import render
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from django.db import models
+from django.utils import timezone
+
+
+from datetime import timedelta
+
+from django.db.models import Q, Sum, Count, F
+
+
 
 class Sport(models.Model):
     """Model representing a book genre."""
@@ -104,22 +113,69 @@ class Team(models.Model):
         """Returns the url to access a particular team."""
         return reverse('team-detail', args=[str(self.id)])
 
+from django.db import models
+from django.urls import reverse
+from django.utils import timezone
+from datetime import timedelta
+
 class Match(models.Model):
-    league = models.ForeignKey(League, on_delete=models.RESTRICT)
-    home_team = models.ForeignKey(Team, on_delete=models.RESTRICT, related_name="home_matches")
-    away_team = models.ForeignKey(Team, on_delete=models.RESTRICT, related_name="away_matches")
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('live', 'Live'),
+        ('finished', 'Finished'),
+        ('postponed', 'Postponed'),
+    ]
+
+    league = models.ForeignKey('League', on_delete=models.RESTRICT)
+    home_team = models.ForeignKey('Team', on_delete=models.RESTRICT, related_name="home_matches")
+    away_team = models.ForeignKey('Team', on_delete=models.RESTRICT, related_name="away_matches")
     start_time = models.DateTimeField()
-    status = models.CharField(max_length=20, choices=[('scheduled', 'Scheduled'), ('live', 'Live'), ('finished', 'Finished')])
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled', editable=False)
     home_score = models.IntegerField(null=True, blank=True)
     away_score = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        """String for representing the Model object."""
         return f'{self.home_team} vs {self.away_team}'
 
     def get_absolute_url(self):
-        """Returns the URL to access a detail record for this match."""
         return reverse('match-detail', args=[str(self.id)])
+
+    # ✅ Manually postpone a match
+    def postpone(self):
+        """Pause this match — no timer updates while postponed."""
+        self.status = 'postponed'
+        self.save(update_fields=['status'])
+
+    # ✅ Resume a postponed match
+    def resume(self, new_start_time=None):
+        """Resume a postponed match, optionally rescheduling."""
+        if new_start_time:
+            self.start_time = new_start_time
+        self.status = 'scheduled'
+        self.save(update_fields=['status', 'start_time'])
+
+    # ✅ Automatically determine current status
+    def auto_update_status(self):
+        """Automatically update match status based on time."""
+        if self.status == 'postponed':
+            return  # Skip postponed matches
+
+        now = timezone.now()
+        match_duration = timedelta(minutes=90)
+
+        # Decide new status
+        if now < self.start_time:
+            new_status = 'scheduled'
+        elif self.start_time <= now < self.start_time + match_duration:
+            new_status = 'live'
+        else:
+            new_status = 'finished'
+
+        # Update if changed
+        if self.status != new_status:
+            self.status = new_status
+            self.save(update_fields=['status'])
+
 
 
 from django.db import models
@@ -237,5 +293,5 @@ def calculate_league_table(league):
 
 def league_table_view(request, league_id, season_id=None):
     league = League.objects.get(pk=league_id)
-    table_data = calculate_league_table(league, season)
+    table_data = calculate_league_table(league)
     return render(request, 'league_table.html', {'table': table_data, 'league': league})

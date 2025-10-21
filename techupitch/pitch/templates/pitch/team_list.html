@@ -1,17 +1,69 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | Teams</title>
+{% endblock %}
 
 {% block content %}
-  <h1>Team List</h1>
+<div class="container my-5">
+  <h1 class="fw-bold text-center mb-4">All Teams</h1>
+  <p class="text-center text-muted mb-5">Browse university teams and their leagues</p>
+
   {% if team_list %}
-    <ul>
+    <div class="row g-4">
       {% for team in team_list %}
-      <li>
-        <a href="{{ team.get_absolute_url }}">{{ team.name }}</a>
-        ({{team.logo}} {{team.league}})
-      </li> 
+        <div class="col-md-4 col-sm-6">
+          <div class="card shadow-sm border-0 h-100 text-center p-3">
+
+            <!-- Team Logo -->
+            {% if team.logo %}
+              <img src="{{ team.logo.url }}" alt="{{ team.name }} logo"
+                   class="mx-auto rounded-circle border shadow-sm mb-3"
+                   style="width: 100px; height: 100px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'images/default-team.png' %}" alt="Default logo"
+                   class="mx-auto rounded-circle border shadow-sm mb-3"
+                   style="width: 100px; height: 100px; object-fit: cover;">
+            {% endif %}
+
+            <!-- Team Details -->
+            <div class="card-body">
+              <h5 class="card-title fw-bold mb-2">
+                <a href="{{ team.get_absolute_url }}" class="text-decoration-none text-dark">
+                  {{ team.name }}
+                </a>
+              </h5>
+
+              <p class="mb-1 text-muted"><strong>University:</strong> {{ team.university }}</p>
+
+              <p class="mb-0">
+                <strong>Leagues:</strong>
+                {% if team.league.all %}
+                  {% for lg in team.league.all %}
+                    <a href="{{ lg.get_absolute_url }}" class="text-decoration-none">{{ lg.name }}</a>{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <em>No leagues assigned</em>
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p>There are no teams yet.</p>
+    <div class="alert alert-info text-center mt-4">
+      There are no teams yet.
+    </div>
   {% endif %}
+</div>
+
+{% if user.is_staff and perms.catalog.add_team %}
+  <div class="text-center mt-4">
+    <a href="{% url 'team-create' %}" class="btn btn-outline-primary btn-sm shadow-sm">
+      Add Team
+    </a>
+  </div>
+{% endif %}
 {% endblock %}

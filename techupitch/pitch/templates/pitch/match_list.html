@@ -1,17 +1,77 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | Matches</title>
+{% endblock %}
 
 {% block content %}
-  <h1>Match List</h1>
-  {% if match_list %}
-    <ul>
-      {% for match in match_list %}
-      <li>
-        <a href="{{ match.get_absolute_url }}">{{ match.home_team }}</a>
-        ({{match.away_team}}) <br>  ({{match.home_score}}) : ({{match.away_score}})
-      </li>
-      {% endfor %}
-    </ul>
+
+
+<!-- Match Cards -->
+
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="container mt-5">
+  {% if grouped_matches %}
+    {% for league, matches in grouped_matches.items %}
+      <div class="mb-5">
+        <h3 class="fw-bold border-bottom pb-2">{{ league }}</h3>
+        <div class="row g-4 mt-2">
+          {% for match in matches %}
+            <div class="col-md-6 col-lg-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                  <h5 class="card-title fw-bold">
+                    <a href="{{ match.get_absolute_url }}" class="text-decoration-none text-dark">
+                      {{ match.home_team }} vs {{ match.away_team }}
+                    </a>
+                  </h5>
+                  <p class="card-text text-muted mb-1">
+                    Score:
+                    <span class="fw-bold">{{ match.home_score }}</span> :
+                    <span class="fw-bold">{{ match.away_score }}</span>
+                  </p>
+                  <p class="text-muted">
+                    🕒 {{ match.start_time|date:"M d, Y H:i" }}
+                    <span class="badge
+                      {% if match.status == 'live' %} bg-success
+                      {% elif match.status == 'finished' %} bg-dark
+                      {% elif match.status == 'postponed' %} bg-warning text-dark
+                      {% else %} bg-secondary {% endif %}">
+                      {{ match.status|title }}
+                    </span>
+                    </p>
+                  </div>
+                  </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
   {% else %}
-    <p>There are no Match in the library.</p>
+    <div class="alert alert-info text-center mt-4">
+      There are no matches in the system yet.
+    </div>
   {% endif %}
+
+
+  {% if user.is_staff and perms.catalog.add_match %}
+    <div class="text-center mt-4">
+      <a href="{% url 'match-create' %}" class="btn btn-outline-primary btn-sm shadow-sm">
+        Add Match
+      </a>
+    </div>
+  {% endif %}
+</div>
+
 {% endblock %}

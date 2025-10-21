@@ -1,17 +1,61 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | Players</title>
+{% endblock %}
 
 {% block content %}
-  <h1>Player List</h1>
+<div class="container mt-5 mb-5">
+  <h1 class="text-center fw-bold mb-4">All Players</h1>
+  <p class="text-center text-muted mb-5">Explore player profiles and stats</p>
+
   {% if player_list %}
-    <ul>
+    <div class="row g-4">
       {% for player in player_list %}
-      <li>
-        <a href="{{ player.get_absolute_url }}">{{player.name}}</a>
-        ({{player.dept}}) <br>  ({{player.team}})  ({{player.position}})
-      </li>
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0 h-100 text-center p-3">
+
+            <!-- Player Image -->
+            {% if player.image %}
+              <img src="{{ player.image.url }}" 
+                   alt="{{ player.name }} photo" 
+                   class="rounded-circle mx-auto d-block mb-3 shadow-sm"
+                   style="width: 120px; height: 120px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'images/default-player.png' %}" 
+                   alt="Default player photo" 
+                   class="rounded-circle mx-auto d-block mb-3 shadow-sm"
+                   style="width: 120px; height: 120px; object-fit: cover;">
+            {% endif %}
+
+            <!-- Player Details -->
+            <h5 class="card-title fw-bold mb-2">
+              <a href="{{ player.get_absolute_url }}" class="text-decoration-none text-dark">
+                {{ player.name }}
+              </a>
+            </h5>
+            <p class="mb-1"><strong>Dept:</strong> {{ player.dept }}</p>
+            <p class="mb-1"><strong>Team:</strong> {{ player.team }}</p>
+            <p class="mb-0"><strong>Position:</strong> {{ player.position }}</p>
+
+          </div>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p>There are no Player yet</p>
+    <div class="alert alert-info text-center mt-4">
+      There are no players yet.
+    </div>
   {% endif %}
+
+  <!-- Add Player Button (for staff only) -->
+  {% if user.is_staff and perms.catalog.add_player %}
+    <div class="text-center mt-4">
+      <a href="{% url 'player-create' %}" class="btn btn-outline-primary btn-sm shadow-sm">
+        Add Player
+      </a>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

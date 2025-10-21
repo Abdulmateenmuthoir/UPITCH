@@ -1,8 +1,21 @@
-<h1>{{ league.name }} League Table</h1>
+{% extends "base_generic.html" %}
+{% load static %}
 
-<table>
-    <thead>
-        <tr>
+{% block title %}
+  <title>U Pitch | {{ league.name }} Table</title>
+{% endblock %}
+
+{% block content %}
+<!-- Stadium Banner -->
+
+
+<!-- League Table -->
+<div class="container mt-5">
+  {% if table %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover text-center align-middle shadow-sm">
+        <thead class="table-dark">
+          <tr>
             <th>Pos.</th>
             <th>Team</th>
             <th>P</th>
@@ -13,13 +26,17 @@
             <th>GA</th>
             <th>GD</th>
             <th>Pts</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in table %}
-        <tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in table %}
+          <tr>
             <td>{{ row.position }}</td>
-            <td>{{ row.team.name }}</td>
+            <td class="text-start fw-bold">
+              <a href="{{ row.team.get_absolute_url }}" class="text-decoration-none">
+                {{ row.team.name }}
+              </a>
+            </td>
             <td>{{ row.played }}</td>
             <td>{{ row.wins }}</td>
             <td>{{ row.draws }}</td>
@@ -27,8 +44,24 @@
             <td>{{ row.goals_for }}</td>
             <td>{{ row.goals_against }}</td>
             <td>{{ row.goal_difference }}</td>
-            <td>{{ row.points }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>    
+            <td class="fw-bold">{{ row.points }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center mt-4">
+      No table data available for this league yet.
+    </div>
+  {% endif %}
+</div>
+
+
+<div class="text-center mt-4">
+  <a href="{% url 'leagues' %}" class="btn btn-outline-primary">
+    ← Back to Leagues
+  </a>
+</div>
+
+{% endblock %}

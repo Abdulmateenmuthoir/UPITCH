@@ -1,13 +1,99 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | {{ match.home_team }} vs {{ match.away_team }}</title>
+{% endblock %}
 
 {% block content %}
-  <h1>{{ match.home_team }} VS {{match.away_team}}</h1>
 
-  <p><strong>Score</strong> {{ match.home_score }} {{ match.away_score}}</p>
-  <!-- author detail link not yet defined -->
-  <p><strong>Status:</strong> {{ match.status }}</p>
-  <p><strong>Time:</strong> {{ match.start_time }}</p>
-  <p><strong>League:</strong> {{ match.league }}</p>
- 
+<!-- Match Details Card -->
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-body text-center">
+
+          <!-- 🏟️ Team Logos and Names -->
+          <div class="d-flex align-items-center justify-content-center mb-3">
+            <!-- Home Team -->
+            <a href="{{ match.home_team.get_absolute_url }}" class="d-flex align-items-center text-decoration-none text-dark me-3">
+              {% if match.home_team.logo %}
+                <img src="{{ match.home_team.logo.url }}" alt="{{ match.home_team }}" class="rounded-circle me-2" width="40" height="40">
+              {% else %}
+                <img src="{% static 'images/default_team_logo.png' %}" alt="No logo" class="rounded-circle me-2" width="40" height="40">
+              {% endif %}
+              <strong>{{ match.home_team }}</strong>
+            </a>
+
+            <span class="text-primary fw-bold fs-4 mx-2">vs</span>
+
+            <!-- Away Team -->
+            <a href="{{ match.away_team.get_absolute_url }}" class="d-flex align-items-center text-decoration-none text-dark ms-3">
+              {% if match.away_team.logo %}
+                <img src="{{ match.away_team.logo.url }}" alt="{{ match.away_team }}" class="rounded-circle me-2" width="40" height="40">
+              {% else %}
+                <img src="{% static 'images/default_team_logo.png' %}" alt="No logo" class="rounded-circle me-2" width="40" height="40">
+              {% endif %}
+              <strong>{{ match.away_team }}</strong>
+            </a>
+          </div>
+
+          <!-- 🧮 Scores -->
+          <h4 class="mb-3">
+            <span class="fw-bold">{{ match.home_score }}</span>
+            :
+            <span class="fw-bold">{{ match.away_score }}</span>
+          </h4>
+
+          <!-- 📊 Status -->
+          <p>
+            <strong>Status:</strong>
+            <span class="badge
+              {% if match.status == 'live' %} bg-success
+              {% elif match.status == 'finished' %} bg-dark
+              {% elif match.status == 'postponed' %} bg-warning text-dark
+              {% else %} bg-secondary {% endif %}">
+              {{ match.status|title }}
+            </span>
+          </p>
+
+          <!-- 🕒 Details -->
+          <p><strong>Kickoff:</strong> {{ match.start_time|date:"M d, Y H:i" }}</p>
+          <p><strong>League:</strong> {{ match.league }}</p>
+
+          <a href="{% url 'matchs' %}" class="btn btn-outline-primary mt-3">← Back to Matches</a>
+
+          {% if user.is_staff %}
+            <div class="mt-4">
+              {% if match.status != 'postponed' %}
+                <form action="{% url 'postpone-match' match.id %}" method="post" class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-warning btn-sm">Postpone Match</button>
+                </form>
+              {% else %}
+                <form action="{% url 'resume-match' match.id %}" method="post" class="d-inline">
+                  {% csrf_token %}
+                  <button class="btn btn-success btn-sm">Resume Match</button>
+                </form>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if perms.catalog.change_match or perms.catalog.delete_match %}
+  <div class="text-center mt-4">
+    {% if perms.catalog.change_match %}
+      <a href="{% url 'match-update' match.id %}" class="btn btn-outline-secondary me-2">Edit Match</a>
+    {% endif %}
+    {% if perms.catalog.delete_match %}
+      <a href="{% url 'match-delete' match.id %}" class="btn btn-outline-danger">Delete Match</a>
+    {% endif %}
+  </div>
+{% endif %}
 
 {% endblock %}

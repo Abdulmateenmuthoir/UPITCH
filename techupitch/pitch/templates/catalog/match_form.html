@@ -1,0 +1,67 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm p-4">
+    <h2 class="mb-3 text-center">
+      {% if form.instance.pk %}
+        Update Match
+      {% else %}
+        Create New Match
+      {% endif %}
+    </h2>
+    <hr>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">League</label>
+          {{ form.league }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Start Time</label>
+          {{ form.start_time }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Home Team</label>
+          {{ form.home_team }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Away Team</label>
+          {{ form.away_team }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Home Score</label>
+          {{ form.home_score }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Away Score</label>
+          {{ form.away_score }}
+        </div>
+      </div>
+
+
+      <div class="d-flex justify-content-between">
+        <a href="{% url 'matchs' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          {% if form.instance.pk %}
+            Update Match
+          {% else %}
+            Create Match
+          {% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

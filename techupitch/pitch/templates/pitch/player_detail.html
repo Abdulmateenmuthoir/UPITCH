@@ -1,16 +1,85 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | {{ player.name }}</title>
+{% endblock %}
 
 {% block content %}
-  <h1> Player Name:{{ player.name }} </h1>
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-body">
 
-  <p><strong>Department</strong> {{ player.dept }}</p>
-  <!-- author detail link not yet defined -->
-  <p><strong>Current Team: </strong> {{ player.team }}</p>
-  <p><strong>position: </strong> {{ player.position }}</p>
-  <p><strong>University: </strong> {{player.university}}</p>
-  <p><strong>Number: </strong> {{player.jersey_number}}</p>
-  <p><strong>Date Of Birth : </strong> {{ player.date_of_birth }}</p>
-  <p><strong>Height: </strong>  <td>{{ player.height_cm}}</td> </p>
- 
+          <!-- Player Image -->
+          <div class="text-center mb-4">
+            {% if player.image %}
+              <img src="{{ player.image.url }}" 
+                   alt="{{ player.name }} photo" 
+                   class="rounded-circle shadow-sm" 
+                   style="width: 150px; height: 150px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'images/default-player.png' %}" 
+                   alt="Default player photo" 
+                   class="rounded-circle shadow-sm" 
+                   style="width: 150px; height: 150px; object-fit: cover;">
+            {% endif %}
+          </div>
 
+          <!-- Player Name -->
+          <h3 class="fw-bold mb-4 text-center">{{ player.name }}</h3>
+
+          <!-- Player Details -->
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Department:</strong> {{ player.dept }}
+            </li>
+            <li class="list-group-item">
+              <strong>Current Team:</strong>
+              <a href="{{ player.team.get_absolute_url }}" class="text-decoration-none">
+                {{ player.team }}
+              </a>
+            </li>
+            <li class="list-group-item">
+              <strong>Position:</strong> {{ player.position }}
+            </li>
+            <li class="list-group-item">
+              <strong>University:</strong> {{ player.university }}
+            </li>
+            <li class="list-group-item">
+              <strong>Jersey Number:</strong> {{ player.jersey_number }}
+            </li>
+            <li class="list-group-item">
+              <strong>Date of Birth:</strong> {{ player.date_of_birth|date:"M d, Y" }}
+            </li>
+            <li class="list-group-item">
+              <strong>Height:</strong> {{ player.height_cm }} cm
+            </li>
+          </ul>
+
+
+
+          <!-- Admin Controls -->
+          {% if perms.catalog.change_player or perms.catalog.delete_player %}
+          <div class="text-center mt-4">
+            {% if perms.catalog.change_player %}
+              <a href="{% url 'player-update' player.id %}" class="btn btn-outline-secondary me-2">Edit Player</a>
+            {% endif %}
+            {% if perms.catalog.delete_player %}
+              <a href="{% url 'player-delete' player.id %}" class="btn btn-outline-danger">Delete Player</a>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Back Button -->
+          <div class="text-center mt-4">
+            <a href="{% url 'players' %}" class="btn btn-outline-primary">← Back to Players</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

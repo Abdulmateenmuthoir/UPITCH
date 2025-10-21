@@ -1,0 +1,36 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="fw-bold mb-4 text-danger text-center">
+    Delete Player: {{ player.name }}
+  </h2>
+
+  {% if player.team %}
+    <p class="text-center">
+      <strong>{{ player.name }}</strong> currently plays for <strong>{{ player.team.name }}</strong>.
+    </p>
+  {% endif %}
+
+  {% if player.match_set.all %}
+    <div class="alert alert-warning text-center mt-4">
+      <p>You can’t delete this player until all their matches have been deleted:</p>
+      <ul class="list-unstyled">
+        {% for match in player.match_set.all %}
+          <li>
+            <a href="{% url 'match-detail' match.pk %}">{{ match }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <p class="text-center">Are you sure you want to delete this player?</p>
+
+    <form method="POST" class="text-center mt-4">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger px-4">Yes, Delete</button>
+      <a href="{{ player.get_absolute_url }}" class="btn btn-secondary px-4 ms-2">Cancel</a>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

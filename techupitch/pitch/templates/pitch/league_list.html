@@ -1,17 +1,48 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | Leagues</title>
+{% endblock %}
 
 {% block content %}
-  <h1>League List</h1>
+<!-- Stadium Banner -->
+<div class="hero-section position-relative text-white d-flex justify-content-center align-items-center"
+     style="background-image: url('{% static "images/stadium.png" %}');
+            background-size: cover;
+            background-position: center;
+            height: 300px;">
+  <div class="text-center">
+    <h1 class="fw-bold display-5">🏆 League List</h1>
+    <p class="lead mb-0">Explore leagues by sport</p>
+  </div>
+</div>
+
+
+
+<!-- League Cards -->
+<div class="container mt-5">
   {% if league_list %}
-    <ul>
+    <div class="row g-4">
       {% for league in league_list %}
-      <li>
-        <a href="{{ league.get_absolute_url }}">{{ league.name }}</a>
-        ({{league.sport}})
-      </li>
+        <div class="col-md-6 col-lg-4">
+          <div class="card shadow-sm border-0 h-100 text-center">
+            <div class="card-body">
+              <h5 class="card-title fw-bold">
+                <a href="{{ league.get_absolute_url }}" class="text-decoration-none text-dark">
+                  {{ league.name }}
+                </a>
+              </h5>
+
+            </div>
+          </div>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p>There are no League yet.</p>
+    <div class="alert alert-info text-center mt-4">
+      There are no leagues yet.
+    </div>
   {% endif %}
+</div>
 {% endblock %}

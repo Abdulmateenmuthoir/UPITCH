@@ -1,26 +1,72 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | {{ team.name }}</title>
+{% endblock %}
 
 {% block content %}
-  <h1>Title: {{ team.name }}</h1>
+<div class="container my-5">
+  <div class="card shadow-sm border-0 p-4">
 
-  <p><strong>Logo:</strong> {{ team.logo }} </p>
-  <!-- author detail link not yet defined -->
-  <p><strong>Sport:</strong> {{ team.sport }}</p>
-  <p><strong>University:</strong> {{ team.university }}</p>
+    <!-- Team Logo -->
+    <div class="text-center mb-4">
+      {% if team.logo %}
+        <img src="{{ team.logo.url }}" alt="{{ team.name }} logo"
+             class="img-fluid rounded-circle border shadow-sm"
+             style="width: 120px; height: 120px; object-fit: cover;">
+      {% else %}
+        <img src="{% static 'images/default-team.png' %}" alt="Default logo"
+             class="img-fluid rounded-circle border shadow-sm"
+             style="width: 120px; height: 120px; object-fit: cover;">
+      {% endif %}
+    </div>
 
- 
+    <!-- Team Info -->
+    <h2 class="text-center mb-3 fw-bold">{{ team.name }}</h2>
 
+    <p><strong>Sport:</strong> {{ team.sport }}</p>
+    <p><strong>University:</strong> {{ team.university }}</p>
 
-  <p><strong>Leagues:</strong>
-  {% for lg in team.leagues.all %}
-    <a href="{{ lg.get_absolute_url }}">{{ lg.name }}</a>{% if not forloop.last %}, {% endif %}
-  {% empty %}
-    <em>No leagues assigned</em>
-  {% endfor %}
-  </p>
+    <p><strong>Leagues:</strong>
+      {% for lg in team.league.all %}
+        <a href="{{ lg.get_absolute_url }}">{{ lg.name }}</a>{% if not forloop.last %}, {% endif %}
+      {% empty %}
+        <em>No leagues assigned</em>
+      {% endfor %}
+    </p>
 
+    <!-- Player List -->
+    <h4 class="mt-4 fw-semibold">Players in {{ team.name }}</h4>
+    {% if team.player_set.all %}
+      <ul class="list-unstyled">
+        {% for player in team.player_set.all %}
+          <li class="mb-2">
+            <a href="{{ player.get_absolute_url }}" class="text-decoration-none fw-medium">
+              {{ player.name }}
+            </a>
+            — {{ player.position|default:"Unknown" }}
+            {% if player.jersey_number %}
+              (#{{ player.jersey_number }})
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p><em>No players have been added to this team yet.</em></p>
+    {% endif %}
+  </div>
 
-
-
-
+  <!-- Edit/Delete Controls -->
+  {% if perms.catalog.change_team or perms.catalog.delete_team %}
+    <div class="text-center mt-4">
+      {% if perms.catalog.change_team %}
+        <a href="{% url 'team-update' team.id %}" class="btn btn-outline-secondary me-2">Edit Team</a>
+      {% endif %}
+      {% if perms.catalog.delete_team %}
+        <a href="{% url 'team-delete' team.id %}" class="btn btn-outline-danger">Delete Team</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

@@ -1,17 +1,127 @@
 {% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | Home</title>
+{% endblock %}
 
 {% block content %}
-  <h1>Local Library Home</h1>
-  <p>
-    Welcome to LocalLibrary, a website developed by
-    <em>Mozilla Developer Network</em>!
-  </p>
-  <h2>Dynamic content</h2>
-  <p>The library has the following record counts:</p>
-  <ul>
-    <li><strong>Matches:</strong> {{ num_matches }}</li>
-    <li><strong>Live Matches:</strong> {{ num_live_matches }}</li>
-    <li><strong>Players:</strong> {{ num_players }}</li>
-    <li><strong>Teams:</strong> {{ num_team }}</li>
-  </ul>
+<div class="hero-section position-relative text-white d-flex justify-content-center align-items-center text-center"
+     style="background-image: url('{% static "images/stadium.png" %}');
+            background-size: cover;
+            background-position: center;
+            height: 350px;">
+  
+  <div>
+    <h1 class="fw-bold">Welcome to U Pitch ⚽</h1>
+    <p class="lead">Your one-stop livescore hub for leagues, matches, teams & more.</p>
+  </div>
+</div>
+
+<div class="container mt-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 text-center">
+        <h5 class="fw-bold">All Leagues</h5>
+        <p>Browse through all available football leagues in one place.</p>
+        <a href="{% url 'leagues' %}" class="btn btn-primary">Explore</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 text-center">
+        <h5 class="fw-bold">All Matches</h5>
+        <p>Follow ongoing and upcoming matches with real-time updates.</p>
+        <a href="{% url 'matchs' %}" class="btn btn-primary">View Matches</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 text-center">
+        <h5 class="fw-bold">All Sports</h5>
+        <p>Not just football—explore other sports across leagues.</p>
+        <a href="{% url 'sports' %}" class="btn btn-primary">See Sports</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Live Matches Section -->
+<div class="container mt-5">
+  <h2 class="fw-bold text-center mb-4">🔴 Live Matches</h2>
+  
+  {% if live_matches %}
+  <div class="row g-4">
+    {% for match in live_matches %}
+    <div class="col-md-4">
+      <div class="card shadow-sm text-center p-3 border-danger">
+        <h5 class="fw-bold">{{ match.home_team }} vs {{ match.away_team }}</h5>
+        <p class="text-muted mb-1">{{ match.league }}</p>
+        <p class="fw-semibold text-danger">LIVE • {{ match.home_score }} - {{ match.away_score }}</p>
+        <a href="{% url 'match-detail' match.id %}" class="btn btn-outline-danger btn-sm">View Match</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-center text-muted">No live matches at the moment.</p>
+  {% endif %}
+</div>
+
+
+<!-- Upcoming Matches Section -->
+<div class="container mt-5">
+  <h2 class="fw-bold text-center mb-4">🕒 Upcoming Matches</h2>
+
+  {% if upcoming_matches %}
+  <div class="row g-4">
+    {% for match in upcoming_matches %}
+    <div class="col-md-4">
+      <div class="card shadow-sm text-center p-3">
+        <h5 class="fw-bold">{{ match.home_team }} vs {{ match.away_team }}</h5>
+        <p class="text-muted mb-1">{{ match.league }}</p>
+        <p class="fw-semibold text-primary">
+          {{ match.start_time|date:"M d, Y H:i" }}
+        </p>
+        <a href="{% url 'match-detail' match.id %}" class="btn btn-outline-primary btn-sm">View Details</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-center text-muted">No upcoming matches scheduled.</p>
+  {% endif %}
+</div>
+
+
+<script>
+function updateMatches() {
+  fetch("{% url 'ajax-matches' %}")
+    .then(res => res.json())
+    .then(data => {
+      const liveDiv = document.getElementById('live-matches');
+      const upcomingDiv = document.getElementById('upcoming-matches');
+
+      // Update Live Matches
+      liveDiv.innerHTML = data.live_matches.length
+        ? data.live_matches.map(m => `
+            <p><strong>${m.home_team}</strong> vs <strong>${m.away_team}</strong> 
+            — ${m.home_score}:${m.away_score}</p>
+          `).join('')
+        : '<p>No live matches right now.</p>';
+
+      // Update Upcoming Matches
+      upcomingDiv.innerHTML = data.upcoming_matches.length
+        ? data.upcoming_matches.map(m => `
+            <p><strong>${m.home_team}</strong> vs <strong>${m.away_team}</strong> 
+            — starts at ${m.start_time}</p>
+          `).join('')
+        : '<p>No upcoming matches.</p>';
+    })
+    .catch(err => console.error('Error fetching match data:', err));
+}
+
+// Refresh every 10 seconds
+setInterval(updateMatches, 10000);
+</script>
+
+
 {% endblock %}

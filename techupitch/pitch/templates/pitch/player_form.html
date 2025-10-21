@@ -1,0 +1,27 @@
+{% extends "base_generic.html" %}
+{% load static %}
+
+{% block title %}
+  <title>U Pitch | {{ view.object|default:"Add Player" }}</title>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">
+    {% if view.object %}Update Player{% else %}Add New Player{% endif %}
+  </h2>
+
+  <form method="post" enctype="multipart/form-data" class="card shadow-sm p-4 mx-auto" style="max-width: 600px;">
+    {% csrf_token %}
+    <div class="table-responsive">
+      <table class="table table-borderless">
+        {{ form.as_table }}
+      </table>
+    </div>
+
+    <div class="text-center">
+      <input type="submit" value="Submit" class="btn btn-primary px-5" />
+    </div>
+  </form>
+</div>
+{% endblock %}
