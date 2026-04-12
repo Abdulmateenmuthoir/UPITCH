@@ -391,3 +391,67 @@ def live_upcoming_matches(request):
     }
 
     return JsonResponse(data)
+
+
+# ==========================================
+# DRF REST API VIEWSETS
+# ==========================================
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .serializers import (
+    SportSerializer, UniversitySerializer, LeagueSerializer,
+    TeamSerializer, MatchSerializer, PlayerSerializer, EventSerializer
+)
+from .models import University
+
+class SportViewSet(viewsets.ModelViewSet):
+    queryset = Sport.objects.all()
+    serializer_class = SportSerializer
+
+class UniversityViewSet(viewsets.ModelViewSet):
+    queryset = University.objects.all()
+    serializer_class = UniversitySerializer
+
+class LeagueViewSet(viewsets.ModelViewSet):
+    queryset = League.objects.all()
+    serializer_class = LeagueSerializer
+
+    @action(detail=True, methods=['get'])
+    def table(self, request, pk=None):
+        league = self.get_object()
+        table_data = calculate_league_table(league)
+        # calculate_league_table returns a list of dicts with the team object
+        serialized_table = []
+        for row in table_data:
+            serialized_table.append({
+                'position': row['position'],
+                'team_id': row['team'].id,
+                'team_name': row['team'].name,
+                'played': row['played'],
+                'wins': row['wins'],
+                'draws': row['draws'],
+                'losses': row['losses'],
+                'goals_for': row['goals_for'],
+                'goals_against': row['goals_against'],
+                'goal_difference': row['goal_difference'],
+                'points': row['points'],
+            })
+        return Response(serialized_table)
+
+class TeamViewSet(viewsets.ModelViewSet):
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
+
+class MatchViewSet(viewsets.ModelViewSet):
+    queryset = Match.objects.all()
+    serializer_class = MatchSerializer
+
+class PlayerViewSet(viewsets.ModelViewSet):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+

@@ -15,33 +15,33 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-]
-
-# Use include() to add paths from the catalog application
-from django.urls import include
-
-urlpatterns += [
-    path('pitch/', include('pitch.urls')),
-]
-
+from django.urls import path, include
 from django.views.generic import RedirectView
-urlpatterns += [
-    path('', RedirectView.as_view(url='pitch/', permanent=True)),
-]
-# Use static() to add URL mapping to serve static files during development (only)
 from django.conf import settings
 from django.conf.urls.static import static
 
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# DRF API Router Setup
+from rest_framework import routers
+from pitch import views as pitch_api_views
 
-urlpatterns += [
+router = routers.DefaultRouter()
+router.register(r'sports', pitch_api_views.SportViewSet)
+router.register(r'universities', pitch_api_views.UniversityViewSet)
+router.register(r'leagues', pitch_api_views.LeagueViewSet)
+router.register(r'teams', pitch_api_views.TeamViewSet)
+router.register(r'matches', pitch_api_views.MatchViewSet)
+router.register(r'players', pitch_api_views.PlayerViewSet)
+router.register(r'events', pitch_api_views.EventViewSet)
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('pitch/', include('pitch.urls')),
+    path('', RedirectView.as_view(url='pitch/', permanent=True)),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
