@@ -1,0 +1,1 @@
+web: gunicorn techupitch.wsgi --log-file -
